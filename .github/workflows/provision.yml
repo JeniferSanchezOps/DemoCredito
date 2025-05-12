@@ -1,19 +1,17 @@
-name: Provision and Deploy
+name: Full Provision and Deploy
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 env:
   TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+  TF_VAR_kms_key_alias_base: eks/credito-cluster
   AWS_REGION: us-east-1
   CLUSTER_NAME: credito-cluster
   NAMESPACE: creditospersonas
-  KMS_ALIAS_NAME: alias/eks/credito-cluster-auto-${{ github.run_id }}
 
 jobs:
-  infra_and_deploy:
+  provision_and_deploy:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -21,7 +19,7 @@ jobs:
         working-directory: terraform
 
     steps:
-      - name: Checkout código
+      - name: Checkout repositorio
         uses: actions/checkout@v3
 
       - name: Configurar credenciales AWS
@@ -42,7 +40,7 @@ jobs:
       - name: Validar Terraform
         run: terraform validate
 
-      - name: Aplicar infraestructura
+      - name: Aplicar Terraform
         run: terraform apply -auto-approve
 
       - name: Instalar kubectl
@@ -52,7 +50,7 @@ jobs:
 
       - name: Configurar kubectl con EKS
         run: |
-          aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+          aws eks update-kubeconfig --region $AWS_REGION --name $(terraform output -raw eks_cluster_name)
 
       - name: Crear namespace si no existe
         run: |

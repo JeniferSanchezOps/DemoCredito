@@ -1,4 +1,11 @@
-variable "region" { default = "us-east-1" }
-variable "db_username" { default = "admin" }
-variable "db_password" {}
-variable "db_name" { default = "credito_db" }
+variable "db_password" {
+  description = "Database master password"
+  type        = string
+  sensitive   = true
+}
+
+variable "kms_key_alias_base" {
+  description = "Base name for KMS key alias"
+  type        = string
+  default     = "eks/credito-cluster"
+}
