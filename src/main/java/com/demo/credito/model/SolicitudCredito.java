@@ -1,8 +1,10 @@
 package com.demo.credito.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
+@Data
 public class SolicitudCredito {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,6 +19,4 @@ public class SolicitudCredito {
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
-
-    // Getters y Setters
 }

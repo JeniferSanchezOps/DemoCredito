@@ -1,9 +1,11 @@
 package com.demo.credito.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import java.util.List;
 
 @Entity
+@Data
 public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,6 +15,4 @@ public class Cliente {
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<SolicitudCredito> solicitudes;
-
-    // Getters y Setters
 }
