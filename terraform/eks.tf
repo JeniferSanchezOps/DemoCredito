@@ -1,10 +1,18 @@
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
+  version         = "20.8.4"
+
   cluster_name    = "credito-cluster"
   cluster_version = "1.27"
   vpc_id          = module.vpc.vpc_id
   subnet_ids      = module.vpc.public_subnets
+
   enable_irsa     = true
+
+  # Alias KMS dinámico para evitar errores por alias ya existentes
+  create_kms_key         = true
+  kms_key_aliases        = ["alias/eks/credito-cluster-${terraform.workspace}"]
+  kms_key_deletion_window_in_days = 7
 }
 
 module "vpc" {
@@ -24,3 +32,4 @@ resource "kubernetes_namespace" "creditos" {
     name = "creditospersonas"
   }
 }
+
