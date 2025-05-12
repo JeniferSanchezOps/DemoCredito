@@ -1,9 +1,19 @@
+resource "random_id" "suffix" {
+  byte_length = 4
+}
+
+resource "aws_db_subnet_group" "credito_subnets" {
+  name       = "credito-subnet-group-${random_id.suffix.hex}"
+  subnet_ids = module.vpc.public_subnets
+}
+
 resource "aws_db_instance" "mysql_credito" {
+  identifier           = "credito-rds-${random_id.suffix.hex}"
   allocated_storage    = 20
   engine               = "mysql"
   engine_version       = "8.0"
   instance_class       = "db.t3.micro"
-  db_name                 = var.db_name
+  db_name              = var.db_name
   username             = var.db_username
   password             = var.db_password
   publicly_accessible  = true
@@ -12,13 +22,9 @@ resource "aws_db_instance" "mysql_credito" {
   vpc_security_group_ids = [aws_security_group.credito_db_sg.id]
 }
 
-resource "aws_db_subnet_group" "credito_subnets" {
-  name       = "credito-subnet-group"
-  subnet_ids = module.vpc.public_subnets
-}
 
 resource "aws_security_group" "credito_db_sg" {
-  name   = "credito-db-sg"
+  name   = "credito-db-sg${random_id.suffix.hex}"
   vpc_id = module.vpc.vpc_id
 
   ingress {
