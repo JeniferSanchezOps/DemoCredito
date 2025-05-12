@@ -15,3 +15,15 @@ variable "region" {
   type        = string
   default     = "us-east-1"
 }
+
+variable "db_username" {
+  description = "Database master username"
+  type        = string
+  default     = "admin"
+}
+
+variable "db_name" {
+  description = "Initial database name"
+  type        = string
+  default     = "creditodb"
+}
