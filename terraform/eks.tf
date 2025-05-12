@@ -8,10 +8,12 @@ module "eks" {
   subnet_ids      = module.vpc.public_subnets
 
   enable_irsa     = true
-
+  resource "random_id" "suffix" {
+  byte_length = 4
+}
   # Alias KMS dinámico para evitar errores por alias ya existentes
   create_kms_key         = true
-  kms_key_aliases        = ["eks/credito-cluster-${terraform.workspace}"]
+  kms_key_aliases = ["eks/credito-cluster-${random_id.suffix.hex}"]
   kms_key_deletion_window_in_days = 7
 }
 
