@@ -19,3 +19,4 @@ terraform.tfvars.json
 
 # VS Code
 .vscode/
+.DS_Store

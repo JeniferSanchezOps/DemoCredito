@@ -13,7 +13,6 @@ public class SolicitudCredito {
     private Double ingresos;
     private Integer personasACargo;
     private Double gastosMensuales;
-
     private String estado;
 
     @ManyToOne

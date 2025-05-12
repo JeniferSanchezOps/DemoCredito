@@ -13,6 +13,8 @@ public class Cliente {
 
     private String nombre;
 
+    private String identificacion;
+
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<SolicitudCredito> solicitudes;
 }
