@@ -4,7 +4,7 @@ resource "random_id" "suffix" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.8.4"
+  version = "19.16.0"
 
   cluster_name    = "credito-cluster-${random_id.suffix.hex}"
   cluster_version = "1.27"
@@ -12,6 +12,4 @@ module "eks" {
   subnet_ids      = module.vpc.public_subnets
 
   enable_irsa     = true
-  create_kms_key  = true
-  kms_key_aliases = ["eks/credito-cluster-${random_id.suffix.hex}"]
 }
