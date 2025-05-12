@@ -2,8 +2,8 @@ module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   cluster_name    = "credito-cluster"
   cluster_version = "1.27"
-  subnets         = module.vpc.public_subnets
   vpc_id          = module.vpc.vpc_id
+  subnet_ids      = module.vpc.public_subnets
   enable_irsa     = true
 }
 
@@ -21,6 +21,6 @@ data "aws_eks_cluster_auth" "cluster" {
 
 resource "kubernetes_namespace" "creditos" {
   metadata {
-    name = "Creditospersonas"
+    name = "creditospersonas"
   }
 }
