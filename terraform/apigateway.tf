@@ -21,4 +21,4 @@ resource "aws_apigatewayv2_route" "credito_route" {
   api_id    = aws_apigatewayv2_api.credito_api.id
   route_key = "POST /solicitud"
   target    = "integrations/${aws_apigatewayv2_integration.credito_integration.id}"
-}
+} 
