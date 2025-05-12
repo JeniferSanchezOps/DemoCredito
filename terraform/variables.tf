@@ -9,3 +9,9 @@ variable "kms_key_alias_base" {
   type        = string
   default     = "eks/credito-cluster"
 }
+
+variable "region" {
+  description = "AWS region to deploy resources in"
+  type        = string
+  default     = "us-east-1"
+}
