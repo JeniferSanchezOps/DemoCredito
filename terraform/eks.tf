@@ -12,7 +12,6 @@ module "eks" {
   subnet_ids      = module.vpc.public_subnets
 
   enable_irsa     = true
-
-  create_kms_key   = true
-  kms_key_aliases  = ["${var.kms_key_alias_base}-${random_id.suffix.hex}"]
+  create_kms_key  = true
+  kms_key_aliases = ["eks/credito-cluster-${random_id.suffix.hex}"]
 }
