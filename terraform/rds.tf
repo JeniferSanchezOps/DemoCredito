@@ -1,14 +1,14 @@
-resource "random_id" "suffix" {
+resource "random_id" "suffix1" {
   byte_length = 4
 }
 
 resource "aws_db_subnet_group" "credito_subnets" {
-  name       = "credito-subnet-group-${random_id.suffix.hex}"
+  name       = "credito-subnet-group-${random_id.suffix1.hex}"
   subnet_ids = module.vpc.public_subnets
 }
 
 resource "aws_db_instance" "mysql_credito" {
-  identifier           = "credito-rds-${random_id.suffix.hex}"
+  identifier           = "credito-rds-${random_id.suffix1.hex}"
   allocated_storage    = 20
   engine               = "mysql"
   engine_version       = "8.0"
@@ -24,7 +24,7 @@ resource "aws_db_instance" "mysql_credito" {
 
 
 resource "aws_security_group" "credito_db_sg" {
-  name   = "credito-db-sg${random_id.suffix.hex}"
+  name   = "credito-db-sg${random_id.suffix1.hex}"
   vpc_id = module.vpc.vpc_id
 
   ingress {
