@@ -11,7 +11,7 @@ module "eks" {
 
   # Alias KMS dinámico para evitar errores por alias ya existentes
   create_kms_key         = true
-  kms_key_aliases        = ["alias/eks/credito-cluster-${terraform.workspace}"]
+  kms_key_aliases        = ["eks/credito-cluster-${terraform.workspace}"]
   kms_key_deletion_window_in_days = 7
 }
 
