@@ -1,14 +1,16 @@
 name: Full Provision and Deploy
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - dev/infra
 
 env:
   TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
-  TF_VAR_kms_key_alias_base: eks/credito-cluster
+  # TF_VAR_kms_key_alias_base: eks/credito-cluster
   AWS_REGION: us-east-1
-  CLUSTER_NAME: credito-cluster
-  NAMESPACE: creditospersonas
+  # CLUSTER_NAME: credito-cluster
+  # NAMESPACE: creditospersonas
 
 jobs:
   provision_and_deploy:
@@ -43,20 +45,20 @@ jobs:
       - name: Aplicar Terraform
         run: terraform apply -auto-approve
 
-      - name: Instalar kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: v1.27.0
+      # - name: Instalar kubectl
+      #   uses: azure/setup-kubectl@v3
+      #   with:
+      #     version: v1.27.0
 
-      - name: Configurar kubectl con EKS
-        run: |
-          aws eks update-kubeconfig --region $AWS_REGION --name $(terraform output -raw eks_cluster_name)
+      # - name: Configurar kubectl con EKS
+      #   run: |
+      #     aws eks update-kubeconfig --region $AWS_REGION --name $(terraform output -raw eks_cluster_name)
 
-      - name: Crear namespace si no existe
-        run: |
-          kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+      # - name: Crear namespace si no existe
+      #   run: |
+      #     kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Aplicar despliegue de la app
-        run: |
-          kubectl apply -f ../k8s/deployment.yml -n $NAMESPACE
-          kubectl apply -f ../k8s/service.yml -n $NAMESPACE
+      # - name: Aplicar despliegue de la app
+      #   run: |
+      #     kubectl apply -f ../k8s/deployment.yml -n $NAMESPACE
+      #     kubectl apply -f ../k8s/service.yml -n $NAMESPACE
