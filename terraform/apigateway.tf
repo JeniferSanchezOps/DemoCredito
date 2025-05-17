@@ -67,7 +67,7 @@
 
 # API Gateway REST API
 resource "aws_api_gateway_rest_api" "main" {
-  name        = var.api_gateway_name
+  name = var.api_gateway_name
 
   endpoint_configuration {
     types = ["REGIONAL"]
@@ -82,11 +82,11 @@ resource "aws_api_gateway_resource" "api_resource" {
 
 # API Gateway root resource method
 resource "aws_api_gateway_method" "root" {
-  rest_api_id   = aws_api_gateway_rest_api.main.id
-  resource_id   = aws_api_gateway_resource.api_resource.id
+  rest_api_id      = aws_api_gateway_rest_api.main.id
+  resource_id      = aws_api_gateway_resource.api_resource.id
   api_key_required = false
-  http_method   = "ANY"
-  authorization = "NONE"
+  http_method      = "ANY"
+  authorization    = "NONE"
 }
 
 # API Gateway integration with the load balancer
@@ -102,14 +102,14 @@ resource "aws_api_gateway_integration" "lb_integration" {
 
 # API Gateway deployment
 resource "aws_api_gateway_deployment" "main" {
-	rest_api_id = aws_api_gateway_rest_api.main.id
-	triggers = {
-	redeployment = sha1(jsonencode([
-		aws_api_gateway_resource.api_resource.id,
-		aws_api_gateway_method.root.id,
-		aws_api_gateway_integration.lb_integration.id
-	]))
-	}
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.api_resource.id,
+      aws_api_gateway_method.root.id,
+      aws_api_gateway_integration.lb_integration.id
+    ]))
+  }
 
   lifecycle {
     create_before_destroy = true
@@ -129,14 +129,14 @@ resource "aws_cloudwatch_log_group" "api_gateway" {
   retention_in_days = 7
 }
 
-# API Gateway Method settings for logging
-resource "aws_api_gateway_method_settings" "main" {
-  rest_api_id = aws_api_gateway_rest_api.main.id
-  stage_name  = aws_api_gateway_stage.main.stage_name
-  method_path = "*/*"
+# # API Gateway Method settings for logging
+# resource "aws_api_gateway_method_settings" "main" {
+#   rest_api_id = aws_api_gateway_rest_api.main.id
+#   stage_name  = aws_api_gateway_stage.main.stage_name
+#   method_path = "*/*"
 
-  settings {
-    metrics_enabled = true
-    logging_level   = "INFO"
-  }
-}
+#   settings {
+#     metrics_enabled = true
+#     logging_level   = "INFO"
+#   }
+# }

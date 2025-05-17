@@ -1,6 +1,6 @@
 variable "aws_region" {
-  type        = string
-  default     = "us-east-1"
+  type    = string
+  default = "us-east-1"
 }
 
 variable "environment" {
@@ -10,8 +10,8 @@ variable "environment" {
 }
 
 variable "project_name" {
-  type        = string
-  default     = "the-bank-credito-solicitud"
+  type    = string
+  default = "the-bank-credito-solicitud"
 }
 
 variable "kms_key_alias_base" {
