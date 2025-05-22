@@ -83,8 +83,6 @@ jobs:
           sudo systemctl start docker
           docker load < cliente-personas-service.tar
           docker run --env-file .env -d -p 8080:8080 --name cliente-app cliente-personas-service
-EOF
-
     - name: Mostrar URL final
       run: |
         echo "🌐 Microservicio desplegado en:"
