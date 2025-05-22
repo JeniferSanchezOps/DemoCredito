@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    volumes:
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: creditodb
+    ports:
+      - "3306:3306"
+
+  cliente-personas:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    env_file:
+      - .env
