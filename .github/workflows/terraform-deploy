@@ -1,0 +1,44 @@
+name: Provision AWS Infrastructure with Terraform
+
+on:
+  workflow_dispatch:  # lo puedes ejecutar manualmente desde la pestaña "Actions"
+
+jobs:
+  terraform:
+    name: Terraform Provision
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./terraform-ec2-project  # 🧭 Ajusta si tu carpeta se llama diferente
+
+    steps:
+    - name: 📥 Checkout código
+      uses: actions/checkout@v3
+
+    - name: 🔐 Configurar credenciales AWS
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: ⚙️ Instalar Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.7
+
+    - name: 📦 Inicializar Terraform
+      run: terraform init
+
+    - name: 📋 Validar configuración
+      run: terraform validate
+
+    - name: 🔎 Previsualizar cambios
+      run: terraform plan
+
+    - name: 🚀 Aplicar infraestructura
+      run: terraform apply -auto-approve
+
+    - name: 🌐 Mostrar IP pública EC2
+      run: terraform output ec2_public_ip
