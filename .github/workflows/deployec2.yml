@@ -1,0 +1,91 @@
+name: Full Auto Deploy from branch 'jueves' to EC2
+
+on:
+  push:
+    branches:
+      - jueves     # <--- se ejecuta cuando haces push a la rama jueves
+  workflow_dispatch: # <--- o lo puedes ejecutar manualmente
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: us-east-1
+      INSTANCE_TYPE: t2.micro
+      AMI_ID: ami-0c2b8ca1dad447f8a
+      KEY_NAME: github-key
+      SECURITY_GROUP_NAME: github-sg
+      INSTANCE_NAME: github-auto-instance
+
+    steps:
+    - name: Checkout repo desde la rama jueves
+      uses: actions/checkout@v3
+      with:
+        ref: jueves  # <--- especifica que haga checkout del branch jueves
+
+    - name: Configurar credenciales AWS
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Crear clave SSH EC2
+      run: |
+        aws ec2 delete-key-pair --key-name $KEY_NAME || true
+        aws ec2 create-key-pair --key-name $KEY_NAME --query 'KeyMaterial' --output text > ec2key.pem
+        chmod 600 ec2key.pem
+
+    - name: Crear Security Group
+      run: |
+        SG_ID=$(aws ec2 create-security-group --group-name $SECURITY_GROUP_NAME --description "GitHub Actions SG" --output text)
+        aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 22 --cidr 0.0.0.0/0
+        aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 8080 --cidr 0.0.0.0/0
+        echo "SECURITY_GROUP_ID=$SG_ID" >> $GITHUB_ENV
+
+    - name: Lanzar instancia EC2
+      run: |
+        INSTANCE_ID=$(aws ec2 run-instances \
+          --image-id $AMI_ID \
+          --instance-type $INSTANCE_TYPE \
+          --key-name $KEY_NAME \
+          --security-group-ids $SECURITY_GROUP_ID \
+          --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$INSTANCE_NAME}]" \
+          --query 'Instances[0].InstanceId' --output text)
+        echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
+        sleep 20
+        IP=$(aws ec2 describe-instances \
+          --instance-ids $INSTANCE_ID \
+          --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
+        echo "EC2_PUBLIC_IP=$IP" >> $GITHUB_ENV
+
+    - name: Esperar conexión SSH
+      run: |
+        for i in {1..10}; do
+          ssh -o StrictHostKeyChecking=no -i ec2key.pem ec2-user@$EC2_PUBLIC_IP "echo EC2 ready" && break || sleep 10
+        done
+
+    - name: Build Docker y empaquetar
+      run: |
+        docker build -t cliente-personas-service .
+        docker save cliente-personas-service > cliente-personas-service.tar
+
+    - name: Subir artefactos a EC2
+      run: |
+        scp -i ec2key.pem -o StrictHostKeyChecking=no cliente-personas-service.tar ec2-user@$EC2_PUBLIC_IP:/home/ec2-user/
+        scp -i ec2key.pem -o StrictHostKeyChecking=no .env ec2-user@$EC2_PUBLIC_IP:/home/ec2-user/
+
+    - name: Desplegar en EC2
+      run: |
+        ssh -i ec2key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_PUBLIC_IP << 'EOF'
+          sudo yum install docker -y
+          sudo systemctl start docker
+          docker load < cliente-personas-service.tar
+          docker run --env-file .env -d -p 8080:8080 --name cliente-app cliente-personas-service
+EOF
+
+    - name: Mostrar URL final
+      run: |
+        echo "🌐 Microservicio desplegado en:"
+        echo "http://$EC2_PUBLIC_IP:8080/api/productos?clienteId=1"
