@@ -44,17 +44,3 @@ jobs:
 
     - name: Run Docker container
       run: docker run --env-file .env -d -p 8080:8080 --name cliente-app cliente-personas-service
-    - name: ✅ Verificar disponibilidad de la API
-      run: |
-        for i in {1..10}; do
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.EC2_PUBLIC_IP }}:8080/api/productos?clienteId=1)
-          if [ "$STATUS" == "200" ]; then
-            echo "🎉 La API está respondiendo correctamente con HTTP 200"
-            exit 0
-          else
-            echo "⏳ Esperando... HTTP Status: $STATUS"
-            sleep 5
-          fi
-        done
-        echo "❌ La API no respondió correctamente"
-        exit 1

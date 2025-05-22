@@ -1,0 +1,8 @@
+com/demo/cliente/controller/ClientePersonaController.class
+com/demo/cliente/model/ProductoCredito.class
+com/demo/cliente/model/SolicitudProducto.class
+com/demo/cliente/repository/SolicitudProductoRepository.class
+com/demo/cliente/config/DatabaseHealthChecker.class
+com/demo/cliente/model/SolicitudCredito.class
+com/demo/cliente/repository/ProductoCreditoRepository.class
+com/demo/cliente/ClientePersonasServiceApplication.class
